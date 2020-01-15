@@ -10,6 +10,9 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_date" jdbcType="DATE" property="createDate" />
     <result column="role_id" jdbcType="BIGINT" property="roleId" />
+    <result column="rolename" jdbcType="VARCHAR" property="rolename" />
+    <result column="permission_ids" jdbcType="VARCHAR" property="permissionIds" />
+    
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -44,12 +47,8 @@
     user_id, username, realname, password, salt, status, create_date, role_id
   </sql>
   <select id="selectByExample" parameterType="cn.zj.logistics.pojo.UserExample" resultMap="BaseResultMap">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from t_user
+    select t_user.*,t_role.rolename,t_role.permission_ids
+        from t_user left join t_role on t_user.role_id = t_role.role_id 
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>

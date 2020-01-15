@@ -16,16 +16,38 @@ public class User {
     private String salt;
 
     private Integer status;
-    
+    //将毫秒数格式化
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date createDate;
 
     private Long roleId;
+    
+    private String rolename;
+    
+    private String permissionIds;
+    
+    
 
-    public Long getUserId() {
+    public String getRolename() {
+		return rolename;
+	}
+
+	public void setRolename(String rolename) {
+		this.rolename = rolename;
+	}
+
+	public String getPermissionIds() {
+		return permissionIds;
+	}
+
+	public void setPermissionIds(String permissionIds) {
+		this.permissionIds = permissionIds;
+	}
+
+	public Long getUserId() {
         return userId;
     }
-
+    
     public void setUserId(Long userId) {
         this.userId = userId;
     }

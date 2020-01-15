@@ -1,64 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
-    <!-- 配置包扫描 -->
-    <context:component-scan base-package="cn.zj.logistics"/>
+	<!-- 配置包扫描 -->
+	<context:component-scan
+		base-package="cn.zj.logistics" />
 
-    <!-- 加载配置文件 -->
-    <context:property-placeholder location="classpath:db.properties"/>
-    <!-- 配置数据源 -->
-    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-        <!-- 数据库四要素 -->
-        <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="maxActive" value="${jdbc.maxActive}"/>
-    </bean>
-    <!-- 整合mybatis -->
+	<!-- 加载配置文件 -->
+	<context:property-placeholder
+		location="classpath:db.properties" />
+	<!-- 配置数据源 -->
+	<bean id="dataSource"
+		class="com.alibaba.druid.pool.DruidDataSource">
+		<!-- 数据库四要素 -->
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+	</bean>
+	<!-- 整合mybatis -->
 
-    <!-- 配置mapper -->
-    <!-- 解决无法创建mapper接口的代理对象 -->
-    <!-- 创建sqlSessionFactory -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <!-- 注入数据源 -->
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+	<!-- 配置mapper -->
+	<!-- 解决无法创建mapper接口的代理对象 -->
+	<!-- 创建sqlSessionFactory -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource" />
 
-    <!-- 配置userMapper的代理对象 -->
-    <bean  class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!-- 扫描包的形式创建 -->
-        <property name="basePackage" value="cn.zj.logistics.mapper"/>
-    </bean>
+		<!-- 配置mybatis的分页插件 -->
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageInterceptor">
+					<property name="properties">
+						<value>
+							<!-- 方言 -->
+							helperDialect=mysql
+						</value>
+					</property>
+				</bean>
+			</array>
+		</property>
 
-    <!-- 配置事务 -->
-    <!-- 配置事务管理器 -->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <!-- 需要数据源 -->
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+	</bean>
 
-    <!-- 配置通知 -->
-    <tx:advice id="tx" transaction-manager="transactionManager">
-        <tx:attributes>
-            <!-- 配置拦截 -->
-            <!-- DQL -->
-            <tx:method name="select*" read-only="true"/>
-            <!-- DML-->
-            <tx:method name="*" read-only="false" isolation="DEFAULT" propagation="REQUIRED" timeout="-1"/>
-        </tx:attributes>
-    </tx:advice>
-    <!-- 配置AOP切入事务到service层 -->
-    <aop:config>
-        <aop:advisor advice-ref="tx" pointcut="execution(* cn.zj.logistics.service..*.*(..))"/>
-    </aop:config>
+	<!-- 配置userMapper的代理对象 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描包的形式创建 -->
+		<property name="basePackage" value="cn.zj.logistics.mapper" />
+	</bean>
+
+	<!-- 配置事务 -->
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 需要数据源 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 配置通知 -->
+	<tx:advice id="tx" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 配置拦截 -->
+			<!-- DQL -->
+			<tx:method name="select*" read-only="true" />
+			<!-- DML -->
+			<tx:method name="*" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- 配置AOP切入事务到service层 -->
+	<aop:config>
+		<aop:advisor advice-ref="tx"
+			pointcut="execution(* cn.zj.logistics.service..*.*(..))" />
+	</aop:config>
 
 </beans>
