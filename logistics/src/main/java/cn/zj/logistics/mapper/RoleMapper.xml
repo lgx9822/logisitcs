@@ -122,4 +122,13 @@
       permission_ids = #{permissionIds,jdbcType=VARCHAR}
     where role_id = #{roleId,jdbcType=BIGINT}
   </update>
+  
+  
+  <!-- 批量删除 -->
+  <delete id="deleteByArray">
+    delete from t_role where role_id in 
+    <foreach collection="roleIdsArr" item="roleId" open="(" close=")" separator=",">
+        #{roleId}
+    </foreach>
+  </delete>
 </mapper>

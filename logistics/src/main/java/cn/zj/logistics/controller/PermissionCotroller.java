@@ -1,6 +1,5 @@
 package cn.zj.logistics.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,13 +14,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import cn.zj.logistics.mo.MessageObject;
-import cn.zj.logistics.pojo.Role;
-import cn.zj.logistics.pojo.RoleExample;
 import cn.zj.logistics.pojo.Permission;
 import cn.zj.logistics.pojo.PermissionExample;
 import cn.zj.logistics.pojo.PermissionExample.Criteria;
-import cn.zj.logistics.service.RoleService;
 import cn.zj.logistics.service.PermissionService;
+import cn.zj.logistics.service.RoleService;
 
 @Controller
 @RequestMapping("/permission")
@@ -30,14 +27,20 @@ public class PermissionCotroller {
 	@Autowired
 	private PermissionService permissionService;
 
-	@Autowired
-	private RoleService roleService;
-
 	@RequestMapping("/permissionPage")
 	public String permissionPage() {
 		return "permissionPage";
 	}
 
+	//获取所有的权限信息作为z-tree显示
+	@RequestMapping("/getAllPerrmission")
+	@ResponseBody
+	public List<Permission> getAllPermission() {
+		PermissionExample example = new PermissionExample();
+		List<Permission> permissions = permissionService.selectByExample(example);
+		return permissions;
+	}
+	
 	//权限查询列表
 	@RequestMapping("/list")
 	@ResponseBody

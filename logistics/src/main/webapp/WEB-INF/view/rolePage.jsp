@@ -34,23 +34,23 @@
 
 
 
-<title>管理员列表</title>
+<title>角色列表</title>
 </head>
 <body>
 	<nav class="breadcrumb">
 		<i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span>
-		管理员管理 <span class="c-gray en">&gt;</span> 管理员列表
+		角色管理 <span class="c-gray en">&gt;</span> 角色列表
 	</nav>
 	<div class="page-container">
 		<div id="boolbar">
-			<span class="l"><a href="javascript:;" onclick="admin_delCheck()" id="del"
+			<span class="l"><a href="javascript:;" onclick="role_delCheck()" id="del"
 				class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i>
-					批量删除</a> <a href="javascript:;" onclick="admin_add()"
+					批量删除</a> <a href="javascript:;" onclick="role_add()"
 				class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i>
-					添加管理员</a></span>
+					添加角色</a></span>
 		</div>
 
-		<table id="adminTable"
+		<table id="roleTable"
 			class="table table-border table-bordered table-bg">
 		</table>
 
@@ -77,8 +77,10 @@
 
 	<script type="text/javascript">
 		$(function() {
-			$('#adminTable').bootstrapTable({
-				url : 'admin/list.do',
+			$('#roleTable').bootstrapTable({
+				url : 'role/list.do',
+				pagination : true,
+				search : true,
 				responseHandler : function(res) {
 					/*/后台的返回数据跟前端插件所需要的数据名字不同，需改成相同名字
 					res.list结果集
@@ -90,8 +92,6 @@
 					};
 					return data;
 				},
-				pagination : true,
-                search : true,
 				toolbar : "#boolbar",//顶部的工具条
 				//条件搜索的时候ajax请求给后台数据的数据类型（条件搜索post提交必须设置）
 				contentType : 'application/x-www-form-urlencoded',
@@ -107,25 +107,19 @@
 				columns : [ {//显示多选框
 					checkbox : true
 				}, {
-					field : 'userId',
+					field : 'roleId',
 					title : '编号'
 				}, {
-					field : 'username',
-					title : '用户名'
-				}, {
-					field : 'realname',
-					title : '真实姓名'
-				}, {
-					field : 'status',
-					title : '状态'
-				}, {
-					field : 'createDate',
-					title : '创建日期'
-				}, {
 					field : 'rolename',
-					title : '职位'
+					title : '角色名'
 				}, {
-					field : 'userId',
+				    field : 'remark',
+				    title : '备注'
+			    },{
+					field : 'permissionIds',
+					title : '权限的id',
+				},{
+					field : 'roleId',
 					title : '操作',
 					align : 'center',
 					formatter : operationformatter
@@ -140,53 +134,23 @@
 				}
 			})
 		});
-
-		//查看当前的记录,如何删除的是最后一条数据，就调用此函数
-		//function admin_previous(){
-		function admin_adds(){
-			var options = $("#adminTable").bootstrapTable('getOptions');
-			var data = $("#adminTable").bootstrapTable('getData');
-			
-			console.log(options);
-			console.log(options.pageNumber);
-			console.log(options.pageSize);
-			console.log(options.searchText);
-			console.log(data);
-			var pageNum = options.pageNumber-1;
-			var pageSize = options.pageSize;
-			var keyword = options.searchText;
-			$.ajax({
-			    url:"admin/list.do",
-			    data:{pageNum:pageNum,pageSize:pageSize,keyword:keyword},
-			    dataType:"json",
-			    success:function(data){
-	                console.log(data);
-	             }
-			});
-			options.pageNumber = options.pageNumber-1;
-			/* $.get("admin/list.do",{pageNum:pageNum,pageSize:pageSize,keyword:keyword},function(data){
-				console.log("data:"+data);
-			 },dataType:"json"); */
-		}
-		
-		
 		
 		//格式化 ：参数必须是(属性值，当前行的值，索引位置)
 		function operationformatter(value, row, index) {
 			//console.log(value,row,index);
-			var html = "<span onclick='admin_delete("
+			var html = "<span onclick='role_delete("
 					+ value
 					+ ");'style='color:red;cursor:pointer;' class='glyphicon glyphicon-trash'></span>&nbsp;&nbsp;";
-			html += "<span onclick='admin_edit("
+			html += "<span onclick='role_edit("
 					+ value
 					+ ");'style='color:gray;cursor:pointer;' class='glyphicon glyphicon-pencil'></span>";
 			return html;
 		}
 		//删除数据
-		function admin_delete(userId) {
-			var getData = $("#adminTable").bootstrapTable('getData');
+		function role_delete(roleId) {
 			layer.confirm('你确定要删除此数据吗？', function() {
-				$.get("admin/delete.do?userId=" + userId, function(data) {
+				var getData = $("#adminTable").bootstrapTable('getData');
+				$.get("role/delete.do?roleId=" + roleId, function(data) {
 					layer.msg(data.msg, {
 						time : 1500,
 						icon : data.code,
@@ -194,72 +158,66 @@
 					});
 					if (data.code == 1) {
 						if(getData.length == 1){
-							$("#adminTable").bootstrapTable('prevPage');
-						}
+                            $("#adminTable").bootstrapTable('prevPage');
+                        }
 						refreshTable();
-						}
+					}
 				})
 			});
 		}
 		//刷新当前页
 		function refreshTable() {
-			$("#adminTable").bootstrapTable("refresh");
+			$("#roleTable").bootstrapTable("refresh");
 		}
 		
 		//修改数据
-		function admin_edit(userId){
+		function role_edit(roleId){
 			//调用h-ui.admin.js中的一个方法，也是异步请求，对layer的open方法进行增强
-			layer_show("编辑管理员","admin/adminEdit.do?userId="+userId);
+			layer_show("编辑角色","role/roleEdit.do?roleId="+roleId);
 		}
-		//编辑或新增一条数据
-		function admin_add() {
+		//编辑一条数据
+		function role_add() {
 			//在这里面输入任何合法的js语句
 			layer.open({
 				type : 2 //Page层类型
 				,
-				area : [ '800px', '500px' ],
-				title : '新增管理员',
+				area : [ '850px', '500px' ],
+				title : '新增角色',
 				shade : 0.6 //遮罩透明度
 				,
 				maxmin : true //允许全屏最小化
 				,
 				anim : 4 //0-6的动画形式，-1不开启
 				,
-				content : 'admin/adminEdit.do'
+				content : 'role/roleEdit.do'
 			});
 		}
-		//管理员批量删除
-		function admin_delCheck(){
-				var selections = $("#adminTable").bootstrapTable('getSelections');
-	            var userIdsArr = [];
+		//角色批量删除
+		function role_delCheck(){
+				var selections = $("#roleTable").bootstrapTable('getSelections');
+	            var roleIdsArr = [];
 	            for(var i = 0; i < selections.length; i++){
 	                var user =  selections[i];
-	                userIdsArr.push(user.userId);
+	                roleIdsArr.push(user.roleId);
 	            }
-	            var userIds = userIdsArr.join(",");
-	            //console.log("userIds:"+userIds);
-	            if("" != userIds){
+	            var roleIds = roleIdsArr.join(",");
+	            //console.log("roleIds:"+roleIds);
+	            if("" != roleIds){
 	            	layer.confirm("你确定要删除这些数据吗？",function(){
-	            		//发送ajax同步请求
+		            	//发送ajax同步请求
 		                $.ajax({
-		                    url:'admin/deleteChecked.do',
+		                    url:'role/deleteChecked.do',
 		                    type:'post',
 		                    async:false,
-		                    data:{userIds:userIds},
+		                    data:{roleIds:roleIds},
 		                    dataType:'json',
 		                    success:function(data){
 		                        layer.msg(data.msg,{time:1500,icon:data.code,shade:0.2},function(){
-		                            var getData = $("#adminTable").bootstrapTable('getData');
-		                            if(data.code == 1){
-		                            	//console.log(getData);
-		                            	//console.log("getData");
-		                            	//console.log(getData.length);
-		                            	//console.log("getData");
-		                            	//console.log(userIdsArr.length);
-		                            	
-		                            	if(getData.length == userIdsArr.length){
-		                                    $("#adminTable").bootstrapTable('prevPage');
-		                                }
+		                              var getData = $("#adminTable").bootstrapTable('getData');
+		                        	if(data.code == 1){
+		                            	if(getData.length == roleIdsArr.length){
+                                            $("#adminTable").bootstrapTable('prevPage');
+                                        }
 		                                refreshTable();
 		                            }
 		                        });

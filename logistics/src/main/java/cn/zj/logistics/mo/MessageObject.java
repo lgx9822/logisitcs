@@ -1,7 +1,7 @@
 package cn.zj.logistics.mo;
 
 public class MessageObject {
-	private Integer code;
+	private Integer code;//0表示失败，1表示成功
 	private String msg;
 	
 	public static MessageObject createMessageObject(Integer code, String msg) {

@@ -603,7 +603,7 @@ public class UserExample {
         }
 
         public Criteria andRoleIdEqualTo(Long value) {
-            addCriterion("role_id =", value, "roleId");
+            addCriterion("t_user.role_id =", value, "roleId");
             return (Criteria) this;
         }
 

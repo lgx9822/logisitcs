@@ -2,8 +2,15 @@ package cn.zj.logistics.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import javax.naming.AuthenticationException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +45,17 @@ public class AdminController {
 		return "adminPage";
 	}
 
+	@RequestMapping("/login")
+	public String login(HttpServletRequest request,Model m) {
+		String shiroLoginFailure = (String) request.getAttribute("shiroLoginFailure");
+		System.out.println(shiroLoginFailure);
+		if(UnknownAccountException.class.getName().equals(shiroLoginFailure)) {
+			m.addAttribute("errorMsg", "账号不存在");
+		}else if(IncorrectCredentialsException.class.getName().equals(shiroLoginFailure)) {
+			m.addAttribute("errorMsg", "密码有误");
+		}
+		return "forward:/login.jsp";
+	}
 	// 查询列表
 	@RequestMapping("/list")
 	@ResponseBody
@@ -115,7 +133,12 @@ public class AdminController {
 	@RequestMapping("/insert")
 	@ResponseBody
 	public MessageObject insert(User user) {
+		String salt = UUID.randomUUID().toString().substring(0, 5);
+		Md5Hash md5Hash = new Md5Hash(user.getPassword(), salt, 3);
+		user.setPassword(md5Hash.toString());
+		user.setSalt(salt);
 		user.setCreateDate(new Date());
+		
 		MessageObject mo = MessageObject.createMessageObject(0, "新增失败，请联系管理员");
 		int row = userService.insert(user);
 		if(row > 0) {
@@ -128,6 +151,11 @@ public class AdminController {
 	@RequestMapping("/update")
 	@ResponseBody
 	public MessageObject update(User user) {
+		String salt = UUID.randomUUID().toString().substring(0, 5);
+		Md5Hash md5Hash = new Md5Hash(user.getPassword(), salt, 3);
+		user.setPassword(md5Hash.toString());
+		user.setSalt(salt);
+		
 		MessageObject mo = MessageObject.createMessageObject(0, "修改失败，请联系管理员");
 		int row = userService.updateByPrimaryKeySelective(user);
 		if(row > 0) {

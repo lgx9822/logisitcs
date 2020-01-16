@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://shiro.apache.org/tags" prefix="shiro" %>
+
 <%
 	String path = request.getContextPath();
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -18,10 +20,6 @@
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 <link rel="Bookmark" href="/favicon.ico">
 <link rel="Shortcut Icon" href="/favicon.ico" />
-<!--[if lt IE 9]>
-<script type="text/javascript" src="lib/html5shiv.js"></script>
-<script type="text/javascript" src="lib/respond.min.js"></script>
-<![endif]-->
 <link rel="stylesheet" type="text/css"
 	href="static/h-ui/css/H-ui.min.css" />
 <link rel="stylesheet" type="text/css"
@@ -32,10 +30,6 @@
 	href="static/h-ui.admin/skin/default/skin.css" id="skin" />
 <link rel="stylesheet" type="text/css"
 	href="static/h-ui.admin/css/style.css" />
-<!--[if IE 6]>
-<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
-<script>DD_belatedPNG.fix('*');</script>
-<![endif]-->
 <title>Xxx物流管理系统</title>
 <meta name="keywords"
 	content="H-ui.admin v3.1,H-ui网站后台模版,后台模版下载,后台管理系统模版,HTML后台模版下载">
@@ -51,17 +45,16 @@
 					class="logo navbar-slogan f-l mr-10 hidden-xs">v1.0</span> <a
 					aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs"
 					href="javascript:;">&#xe667;</a>
-				
 				<nav id="Hui-userbar"
 					class="nav navbar-nav navbar-userbar hidden-xs">
 					<ul class="cl">
-						<li>超级管理员</li>
+						<li><shiro:principal property="rolename"/></li>
 						<li class="dropDown dropDown_hover"><a href="#"
-							class="dropDown_A">admin <i class="Hui-iconfont">&#xe6d5;</i></a>
+							class="dropDown_A"><shiro:principal property="realname"/><i class="Hui-iconfont">&#xe6d5;</i></a>
 							<ul class="dropDown-menu menu radius box-shadow">
 								<li><a href="javascript:;" onClick="myselfinfo()">个人信息</a></li>
 								<li><a href="#">切换账户</a></li>
-								<li><a href="#">退出</a></li>
+								<li><a href="logout.do">退出</a></li>
 							</ul></li>
 						<li id="Hui-skin" class="dropDown right dropDown_hover"><a
 							href="javascript:;" class="dropDown_A" title="换肤"><i
@@ -89,7 +82,7 @@
 				</dt>
 				<dd>
 					<ul>
-						<li><a data-href="admin-role.html" data-title="角色管理"
+						<li><a data-href="role/rolePage.do" data-title="角色管理"
 							href="javascript:void(0)">角色管理</a></li>
 						<li><a data-href="permission/permissionPage.do" data-title="权限管理"
 							href="javascript:void(0)">权限管理</a></li>
@@ -206,16 +199,5 @@
 		}
 	</script>
 
-	<!--此乃百度统计代码，请自行删除-->
-	<script>
-		var _hmt = _hmt || [];
-		(function() {
-			var hm = document.createElement("script");
-			hm.src = "https://hm.baidu.com/hm.js?080836300300be57b7f34f4b3e97d911";
-			var s = document.getElementsByTagName("script")[0];
-			s.parentNode.insertBefore(hm, s);
-		})();
-	</script>
-	<!--/此乃百度统计代码，请自行删除-->
 </body>
 </html>

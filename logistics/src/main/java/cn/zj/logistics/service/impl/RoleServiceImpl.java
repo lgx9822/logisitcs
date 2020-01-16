@@ -39,4 +39,9 @@ public class RoleServiceImpl implements RoleService {
     public int updateByPrimaryKeySelective(Role record) {
         return roleMapper.updateByPrimaryKeySelective(record);
     }
+
+	@Override
+	public int deleteByArray(String[] roleIdsArr) {
+		return roleMapper.deleteByArray(roleIdsArr);
+	}
 }

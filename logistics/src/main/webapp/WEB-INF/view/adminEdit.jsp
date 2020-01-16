@@ -104,7 +104,7 @@
 $().ready(function(){
 	$("#adminEdit").validate({
 		//定义校验规则
-		rules:{
+		/*rules:{
 			username:{
 				required:true,
 				rangelength:[3,10],
@@ -153,12 +153,12 @@ $().ready(function(){
 	            },
 	            password2:"两次密码不一致",
 	            rolename:"请选择一个角色"
-		},
+		},*/
 		//校验成功的回调
 		submitHandler:function(form){
 			//转jq对象
 			$(form).ajaxSubmit(function(data){
-				layer.msg(data.msg,{time:1500,icon:data.code},function(){
+				layer.msg(data.msg,{time:1500,icon:data.code,shade:0.2},function(){
 					if(data.code == 1){
 						//刷新页面
 						parent.refreshTable();
@@ -166,7 +166,6 @@ $().ready(function(){
 						parent.layer.closeAll();
 					}
 				});
-				
 			});
 		}
 	});

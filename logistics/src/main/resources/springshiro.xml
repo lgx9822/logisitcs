@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+    <!-- 配置自定义表单认证过滤器 -->
+    <bean id="myFormAuthenticationFilter" class="cn.zj.logistics.shiro.MyFormAuthenticationFilter">
+        <property name="usernameParam" value="username"/>
+        <property name="passwordParam" value="password"/>
+        <property name="rememberMeParam" value="rememberMe"/>
+    </bean>
+    <!-- 配置自定义的退出认证过滤器 -->
+    <bean id="myLogout" class="org.apache.shiro.web.filter.authc.LogoutFilter">
+        <property name="redirectUrl" value="/login.jsp"/>
+    </bean>
+    
+    <!-- 配置shiro框架与spring的桥梁 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- 注入自定义的认证过滤器 -->
+        <property name="filters">
+            <map>
+                <entry key="logout" value-ref="myLogout"/>
+                <entry key="authc" value-ref="myFormAuthenticationFilter"/>
+            </map>
+        </property>
+        <!-- 配置安全管理器 -->
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 配置认证失败的路径 -->
+        <property name="loginUrl" value="/admin/login.do"/>
+        <!-- 配置认证成功的路径 -->
+        <property name="successUrl" value="/index.do"/>
+        <!-- 配置权限不足时，跳转的页面：注解无效 -->
+        <property name="unauthorizedUrl" value="unauthorized.jsp"/>
+        <!-- 配置过滤链 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 配置匿名认证过滤器：对静态资源放行 -->
+                /lib/**=anon
+                /static/**=anon
+                /login.jsp=anon
+                /logout.do=logout
+                /index.do=user
+                <!-- 配置表单认证过滤器 -->
+                /**=authc
+            </value>
+        </property>
+    </bean>
+    <!-- 配置安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 配置自定义Realm -->
+        <property name="realm" ref="myRealm"/>
+        <!-- 配置会话管理器 -->
+        <!-- 当有记住我时，session就无效了：每次都会去从cookie中拿 -->
+        <property name="sessionManager" ref="sessionManager"/>
+        <!-- 配置自定义RememberMe过滤器 -->
+        <property name="rememberMeManager" ref="rememberMeManager"/>
+    </bean>
+    
+    <!-- 配置自定义RememberMe过滤器 -->
+    <bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <!-- 配置cookie的时间 -->
+        <property name="cookie">
+            <bean class="org.apache.shiro.web.servlet.SimpleCookie">
+                <!-- 构成注入 -->
+                <!-- 构造器注入cookie的key -->
+                 <constructor-arg value="rememberMe"/>
+                <!-- 单位seconds -->
+                <property name="maxAge" value="#{60 * 60 * 24 * 3}"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- 配置会话管理器 -->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <!-- 删除无效的session和cookie -->
+        <property name="deleteInvalidSessions" value="true"/>
+        <!-- session的过期时间 :单位： milliseconds-->
+        <property name="globalSessionTimeout" value="#{1000 * 60 * 10 }"/>
+    </bean>
+    
+    <!-- 配置自定义Realm -->
+    <bean id="myRealm" class="cn.zj.logistics.shiro.MyRealm">
+        <!-- 凭证加密匹配器 -->
+        <property name="credentialsMatcher" ref="credentialsMatcher"/>
+    </bean>
+    <!-- 凭证加密匹配器 -->
+    <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <!-- 加密方式 -->
+        <property name="hashAlgorithmName" value="MD5"/>
+        <!-- 散列次数 -->
+        <property name="hashIterations" value="3"/>
+    </bean>
+        
+    
+</beans>

@@ -74,7 +74,7 @@
 		src="lib/bootstrap-table/bootstrap-table.min.js"></script>
 	<script type="text/javascript"
 		src="lib/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
-
+    
 	<script type="text/javascript">
 		$(function() {
 			$('#permissionTable').bootstrapTable({
@@ -161,12 +161,17 @@
 		//删除数据
 		function permission_delete(permissionId) {
 			layer.confirm('你确定要删除此数据吗？', function() {
+				var getData = $("#adminTable").bootstrapTable('getData');
 				$.get("permission/delete.do?permissionId=" + permissionId, function(data) {
 					layer.msg(data.msg, {
 						time : 1500,
-						icon : data.code
+						icon : data.code,
+						shade:0.2
 					});
 					if (data.code == 1) {
+						if(getData.length == 1){
+                            $("#adminTable").bootstrapTable('prevPage');
+                        }
 						refreshTable();
 					}
 				})
@@ -219,8 +224,12 @@
 		                    data:{permissionIds:permissionIds},
 		                    dataType:'json',
 		                    success:function(data){
-		                        layer.msg(data.msg,{time:1500,icon:data.code},function(){
+		                        layer.msg(data.msg,{time:1500,icon:data.code,shade:0.2},function(){
+		                    	var getData = $("#adminTable").bootstrapTable('getData');
 		                            if(data.code == 1){
+		                            	if(getData.length == permissionIdsArr.length){
+                                            $("#adminTable").bootstrapTable('prevPage');
+                                        }
 		                                refreshTable();
 		                            }
 		                        });
@@ -228,7 +237,7 @@
 		                });
 	            	});
 	           }else{
-	                layer.msg("请选择一个再删除",{time:1500,icon:0});
+	                layer.msg("请选择一个再删除",{time:1500,icon:0,shade:0.2});
 	          }
 		}
 	</script>

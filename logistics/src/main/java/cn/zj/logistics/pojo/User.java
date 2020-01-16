@@ -1,11 +1,18 @@
 package cn.zj.logistics.pojo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class User {
-    private Long userId;
+public class User implements Serializable{
+	
+    /**
+	 * 序列化版本号
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Long userId;
 
     private String username;
 

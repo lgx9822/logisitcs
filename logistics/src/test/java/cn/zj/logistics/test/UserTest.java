@@ -1,5 +1,6 @@
 package cn.zj.logistics.test;
 
+
 import java.util.List;
 
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.pagehelper.PageInterceptor;
 
 import cn.zj.logistics.pojo.User;
 import cn.zj.logistics.pojo.UserExample;

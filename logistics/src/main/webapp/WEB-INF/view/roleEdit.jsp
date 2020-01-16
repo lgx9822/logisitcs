@@ -25,58 +25,38 @@
 <link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
 <link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
 <link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
-<title>权限管理</title>
+<!-- 引入z-tree的css -->
+<link rel="stylesheet" type="text/css" href="lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" />
+
+<title>角色管理</title>
 <meta name="keywords" content="H-ui.admin v3.1,H-ui网站后台模版,后台模版下载,后台管理系统模版,HTML后台模版下载">
 <meta name="description" content="H-ui.admin v3.1，是一款由国人开发的轻量级扁平化网站后台模板，完全免费开源的网站后台管理系统模版，适合中小型CMS后台系统。">
 </head>
 <body>
 <article class="page-container">
-    <form class="form form-horizontal" id="permissionEdit" action="${permission==null ? 'permission/insert.do':'permission/update.do' }" method="post">
+    <form class="form form-horizontal" id="roleEdit" action="${role==null ? 'role/insert.do':'role/update.do' }" method="post">
     <!-- 隐藏域，用于携带id -->
-    <input type="hidden" name="permissionId" value="${permission.permissionId }"/>
+    <input type="hidden" name="roleId" value="${role.roleId }"/>
+    <!-- 隐藏域，用于携带z-tree的选中值 -->
+    <input type="hidden" name="permissionIds" id="permissionIds"/>
+    
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限名：</label>
+        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="text" class="input-text"  value="${permission.name }" placeholder="请输入用户名" id="name" name="name">
+            <input type="text" class="input-text"  value="${role.rolename }" placeholder="请输入角色名" id="rolename" name="rolename">
         </div>
     </div>
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限表达式：</label>
+        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>备注：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="text" class="input-text" value="${permission.expression }" placeholder="请输入权限表达式（模块:功能）" id="expression" name="expression">
+            <textarea name="remark"  class="textarea"  placeholder="角色说明"  >${role.remark}</textarea>
         </div>
     </div>
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3">权限地址：</label>
+        <label class="form-label col-xs-4 col-sm-3">权限：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="text" class="input-text" autocomplete="off" value="${permission.url }" placeholder="url" id="url" name="url">
+            <ul id="permissionTree" class="ztree"></ul>
         </div>
-    </div>
-     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限类型：</label>
-        <div class="formControls col-xs-8 col-sm-9 skin-minimal">
-            <div class="radio-box">
-                <input name="type" type="radio" id="sex-1" value="permission" ${permission.type eq 'permission' ? 'checked':'' }>
-                <label for="sex-1">普通权限</label>
-            </div>
-            <div class="radio-box">
-                <input type="radio" id="sex-2" name="type" value="menu" ${permission.type eq 'menu' ? 'checked':'' }>
-                <label for="sex-2">菜单权限</label>
-            </div>
-        </div>
-    </div> 
-    <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3">角色：</label>
-        <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
-            <select class="select" name="parentId" size="1">
-                <option value="0">--请选择--</option>
-                <c:forEach items="${parents }" var="parent" >
-                    <c:if test="${parent.parentId != null }">
-                        <option ${ permission.permissionId eq parent.permissionId ? 'selected':'' } value="${parent.permissionId }">${parent.name }</option>
-                    </c:if>
-                </c:forEach>
-            </select>
-            </span> </div>
     </div>
     <div class="row cl">
         <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
@@ -96,35 +76,35 @@
 <script type="text/javascript" src="lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
 <script type="text/javascript" src="lib/jquery.validation/1.14.0/validate-methods.js"></script> 
 <script type="text/javascript" src="lib/jquery.validation/1.14.0/messages_zh.js"></script> 
+<!-- 引入z-tree的js -->
+<script type="text/javascript" src="lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
 <script type="text/javascript">
 $().ready(function(){
-	$("#permissionEdit").validate({
+	$("#roleEdit").validate({
 		//定义校验规则
 		rules:{
-			name:{
+			rolename:{
 				required:true
 			},
-			expression:{
-				required:true
-			},
-			parentId:{
-				required:true
+			remark:{
+				required:true,
+				maxlength:30
 			}
 		},
 		//校验失败的信息提示
 		messages:{
-			 username:{
-	                required:"用户名不能为空",
+			 rolename:{
+	                required:"角色名不能为空",
 	            },
-	            expression:{
-	                required:"权限表达式不能为空",
-	            },
-	            parentId:{
-	                required:"必须要选中一个权限类型"
+	            remark:{
+	                required:"角色说明不能为空",
+	                maxlength:"角色说明不能超过30个字"
 	            }
 		},
 		//校验成功的回调
 		submitHandler:function(form){
+			//在请求时，获取选中的
+			getCheckOptions();
 			//转jq对象
 			$(form).ajaxSubmit(function(data){
 				layer.msg(data.msg,{time:1500,icon:data.code,shade:0.2},function(){
@@ -139,6 +119,53 @@ $().ready(function(){
 			});
 		}
 	});
+	//========================z-tree的使用===============================
+	var setting = {
+	           //开启多选框
+	           check:{
+	               enable:true
+	           },
+	           //json数据的显示
+	           data:{
+	               simpleData:{
+	                   enable:true,
+	                   idKey:"permissionId",
+	                   pIdKey:"parentId"
+	               }
+	           },
+	           
+	           async:{
+	               enable:true,//开启async请求
+	               url:"permission/getAllPerrmission.do",
+	               dataFilter: filter,//在渲染前对数据进行过滤
+	           }
+	   };
+
+	   $(document).ready(function(){
+	       $.fn.zTree.init($("#permissionTree"), setting);
+	   });
+	   
+	   //改造json数据
+	   function filter(treeId, parentNode, childNodes){
+	       for(var i = 0; i < childNodes.length; i++){
+	           childNodes[i].open = true;
+	       }
+	       return childNodes;
+	   }
+	   //获取选中的多选框
+	   function getCheckOptions(){
+	       //获取到tree对象
+	       var treeObj = $.fn.zTree.getZTreeObj("permissionTree");
+	       //获取选中的函数
+	       var nodes = treeObj.getCheckedNodes(true);
+	       console.log(nodes);
+	       var permissionIdsArr = [];
+	       for(var i = 0; i < nodes.length; i++){
+	    	   permissionIdsArr.push(nodes[i].permissionId);
+	       }
+	       $("#permissionIds").val(permissionIdsArr.toString());
+	   }
+	//========================z-tree的使用===============================
 });
 
 </script> 
