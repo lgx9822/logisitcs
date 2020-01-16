@@ -34,23 +34,23 @@
 
 
 
-<title>管理员列表</title>
+<title>权限列表</title>
 </head>
 <body>
 	<nav class="breadcrumb">
 		<i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span>
-		管理员管理 <span class="c-gray en">&gt;</span> 管理员列表
+		权限管理 <span class="c-gray en">&gt;</span> 权限列表
 	</nav>
 	<div class="page-container">
 		<div id="boolbar">
-			<span class="l"><a href="javascript:;" onclick="admin_delCheck()" id="del"
+			<span class="l"><a href="javascript:;" onclick="permission_delCheck()" id="del"
 				class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i>
-					批量删除</a> <a href="javascript:;" onclick="admin_add()"
+					批量删除</a> <a href="javascript:;" onclick="permission_add()"
 				class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i>
-					添加管理员</a></span>
+					添加权限</a></span>
 		</div>
 
-		<table id="adminTable"
+		<table id="permissionTable"
 			class="table table-border table-bordered table-bg">
 		</table>
 
@@ -77,8 +77,8 @@
 
 	<script type="text/javascript">
 		$(function() {
-			$('#adminTable').bootstrapTable({
-				url : 'admin/list.do',
+			$('#permissionTable').bootstrapTable({
+				url : 'permission/list.do',
 				pagination : true,
 				search : true,
 				responseHandler : function(res) {
@@ -107,25 +107,26 @@
 				columns : [ {//显示多选框
 					checkbox : true
 				}, {
-					field : 'userId',
+					field : 'permissionId',
 					title : '编号'
 				}, {
-					field : 'username',
-					title : '用户名'
+					field : 'name',
+					title : '权限名'
 				}, {
-					field : 'realname',
-					title : '真实姓名'
+				    field : 'expression',
+				    title : '权限表达式'
+			    },{
+					field : 'type',
+					title : '权限类型',
+					formatter : typeformatter
 				}, {
-					field : 'status',
-					title : '状态'
+					field : 'url',
+					title : '权限地址'
 				}, {
-					field : 'createDate',
-					title : '创建日期'
-				}, {
-					field : 'rolename',
-					title : '职位'
-				}, {
-					field : 'userId',
+                    field : 'parentName',
+                    title : '父权限'
+                },{
+					field : 'permissionId',
 					title : '操作',
 					align : 'center',
 					formatter : operationformatter
@@ -140,22 +141,27 @@
 				}
 			})
 		});
+		
+		//格式化权限类型的显示
+		function typeformatter(value, row, index){
+			return value == "menu" ? "<span style='color:red;'>菜单权限</span>":"普通权限";
+		}
 
 		//格式化 ：参数必须是(属性值，当前行的值，索引位置)
 		function operationformatter(value, row, index) {
 			//console.log(value,row,index);
-			var html = "<span onclick='admin_delete("
+			var html = "<span onclick='permission_delete("
 					+ value
 					+ ");'style='color:red;cursor:pointer;' class='glyphicon glyphicon-trash'></span>&nbsp;&nbsp;";
-			html += "<span onclick='admin_edit("
+			html += "<span onclick='permission_edit("
 					+ value
 					+ ");'style='color:gray;cursor:pointer;' class='glyphicon glyphicon-pencil'></span>";
 			return html;
 		}
 		//删除数据
-		function admin_delete(userId) {
+		function permission_delete(permissionId) {
 			layer.confirm('你确定要删除此数据吗？', function() {
-				$.get("admin/delete.do?userId=" + userId, function(data) {
+				$.get("permission/delete.do?permissionId=" + permissionId, function(data) {
 					layer.msg(data.msg, {
 						time : 1500,
 						icon : data.code
@@ -168,49 +174,49 @@
 		}
 		//刷新当前页
 		function refreshTable() {
-			$("#adminTable").bootstrapTable("refresh");
+			$("#permissionTable").bootstrapTable("refresh");
 		}
 		
 		//修改数据
-		function admin_edit(userId){
+		function permission_edit(permissionId){
 			//调用h-ui.admin.js中的一个方法，也是异步请求，对layer的open方法进行增强
-			layer_show("编辑管理员","admin/adminEdit.do?userId="+userId);
+			layer_show("编辑权限","permission/permissionEdit.do?permissionId="+permissionId);
 		}
-		//编辑或新增一条数据
-		function admin_add() {
+		//新增一条数据
+		function permission_add() {
 			//在这里面输入任何合法的js语句
 			layer.open({
 				type : 2 //Page层类型
 				,
-				area : [ '800px', '500px' ],
-				title : '新增管理员',
+				area : [ '850px', '500px' ],
+				title : '新增权限',
 				shade : 0.6 //遮罩透明度
 				,
 				maxmin : true //允许全屏最小化
 				,
 				anim : 4 //0-6的动画形式，-1不开启
 				,
-				content : 'admin/adminEdit.do'
+				content : 'permission/permissionEdit.do'
 			});
 		}
-		//管理员批量删除
-		function admin_delCheck(){
-				var selections = $("#adminTable").bootstrapTable('getSelections');
-	            var userIdsArr = [];
+		//权限批量删除
+		function permission_delCheck(){
+				var selections = $("#permissionTable").bootstrapTable('getSelections');
+	            var permissionIdsArr = [];
 	            for(var i = 0; i < selections.length; i++){
 	                var user =  selections[i];
-	                userIdsArr.push(user.userId);
+	                permissionIdsArr.push(user.permissionId);
 	            }
-	            var userIds = userIdsArr.join(",");
-	            //console.log("userIds:"+userIds);
-	            if("" != userIds){
+	            var permissionIds = permissionIdsArr.join(",");
+	            //console.log("permissionIds:"+permissionIds);
+	            if("" != permissionIds){
 	            	layer.confirm("你确定要删除这些数据吗？",function(){
 		            	//发送ajax同步请求
 		                $.ajax({
-		                    url:'admin/deleteChecked.do',
+		                    url:'permission/deleteChecked.do',
 		                    type:'post',
 		                    async:false,
-		                    data:{userIds:userIds},
+		                    data:{permissionIds:permissionIds},
 		                    dataType:'json',
 		                    success:function(data){
 		                        layer.msg(data.msg,{time:1500,icon:data.code},function(){

@@ -1,10 +1,16 @@
 package cn.zj.logistics.mapper;
 
-import cn.zj.logistics.pojo.User;
-import cn.zj.logistics.pojo.UserExample;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
+import cn.zj.logistics.pojo.User;
+import cn.zj.logistics.pojo.UserExample;
+
 public interface UserMapper {
+	
+	int deleteByArray(@Param("userIdsArr") String[] userIdsArr);
+	
     int deleteByPrimaryKey(Long userId);
 
     int insert(User record);

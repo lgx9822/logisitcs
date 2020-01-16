@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="cn.zj.logistics.pojo.Permission">
     <id column="permission_id" jdbcType="BIGINT" property="permissionId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="expression" jdbcType="VARCHAR" property="expression" />
@@ -43,18 +44,18 @@
     permission_id, name, type, url, expression, parent_id, sort
   </sql>
   <select id="selectByExample" parameterType="cn.zj.logistics.pojo.PermissionExample" resultMap="BaseResultMap">
-    select
+    select child.*, parent.name parent_name
     <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List" />
-    from t_permission
+    from t_permission child left join t_permission parent on child.parent_id = parent.permission_id
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
     <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
+    order by type asc
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -157,4 +158,12 @@
       sort = #{sort,jdbcType=INTEGER}
     where permission_id = #{permissionId,jdbcType=BIGINT}
   </update>
+  
+  <!-- 批量删除 -->
+  <delete id="deleteByArray">
+    delete from t_permission where permission_id in 
+    <foreach collection="permissionIdsArr" item="permissionId" open="(" close=")" separator=",">
+        #{permissionId}
+    </foreach>
+  </delete>
 </mapper>

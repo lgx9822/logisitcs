@@ -39,4 +39,9 @@ public class UserServiceImpl implements UserService {
     public int updateByPrimaryKeySelective(User record) {
         return userMapper.updateByPrimaryKeySelective(record);
     }
+
+	@Override
+	public int deleteByArray(String[] userIdsArr) {
+		return userMapper.deleteByArray(userIdsArr);
+	}
 }

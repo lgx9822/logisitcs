@@ -6,6 +6,9 @@ import cn.zj.logistics.pojo.UserExample;
 import java.util.List;
 
 public interface UserService {
+	
+	int deleteByArray(String[] userIdsArr);
+	
     int deleteByPrimaryKey(Long userId);
 
     int insert(User record);

@@ -14,8 +14,18 @@ public class Permission {
     private Long parentId;
 
     private Integer sort;
+    
+    private String parentName;
+    
+    public String getParentName() {
+		return parentName;
+	}
 
-    public Long getPermissionId() {
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
+	public Long getPermissionId() {
         return permissionId;
     }
 

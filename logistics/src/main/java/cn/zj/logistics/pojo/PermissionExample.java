@@ -175,7 +175,7 @@ public class PermissionExample {
         }
 
         public Criteria andNameEqualTo(String value) {
-            addCriterion("name =", value, "name");
+            addCriterion("child.name =", value, "name");
             return (Criteria) this;
         }
 
@@ -205,7 +205,7 @@ public class PermissionExample {
         }
 
         public Criteria andNameLike(String value) {
-            addCriterion("name like", value, "name");
+            addCriterion("child.name like", value, "name");
             return (Criteria) this;
         }
 
@@ -245,7 +245,7 @@ public class PermissionExample {
         }
 
         public Criteria andTypeEqualTo(String value) {
-            addCriterion("type =", value, "type");
+            addCriterion("child.type =", value, "type");
             return (Criteria) this;
         }
 
@@ -455,7 +455,7 @@ public class PermissionExample {
         }
 
         public Criteria andParentIdEqualTo(Long value) {
-            addCriterion("parent_id =", value, "parentId");
+            addCriterion("child.parent_id =", value, "parentId");
             return (Criteria) this;
         }
 

@@ -167,4 +167,11 @@
       role_id = #{roleId,jdbcType=BIGINT}
     where user_id = #{userId,jdbcType=BIGINT}
   </update>
+  <!-- 批量删除 -->
+  <delete id="deleteByArray">
+    delete from t_user where user_id in 
+    <foreach collection="userIdsArr" item="userId" open="(" close=")" separator=",">
+        #{userId}
+    </foreach>
+  </delete>
 </mapper>

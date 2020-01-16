@@ -25,59 +25,55 @@
 <link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
 <link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
 <link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
-<title>添加管理员 - 管理员管理 - H-ui.admin v3.1</title>
+<title>权限管理</title>
 <meta name="keywords" content="H-ui.admin v3.1,H-ui网站后台模版,后台模版下载,后台管理系统模版,HTML后台模版下载">
 <meta name="description" content="H-ui.admin v3.1，是一款由国人开发的轻量级扁平化网站后台模板，完全免费开源的网站后台管理系统模版，适合中小型CMS后台系统。">
 </head>
 <body>
 <article class="page-container">
-    <form class="form form-horizontal" id="adminEdit" action="${user==null ? 'admin/insert.do':'admin/update.do' }" method="post">
+    <form class="form form-horizontal" id="permissionEdit" action="${permission==null ? 'permission/insert.do':'permission/update.do' }" method="post">
     <!-- 隐藏域，用于携带id -->
-    <input type="hidden" name="userId" value="${user.userId }"/>
+    <input type="hidden" name="permissionId" value="${permission.permissionId }"/>
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>管理员：</label>
+        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限名：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="text" class="input-text" ${user==null ? '':'disabled' } value="${user.username }" placeholder="请输入用户名" id="username" name="username">
+            <input type="text" class="input-text"  value="${permission.name }" placeholder="请输入用户名" id="name" name="name">
         </div>
     </div>
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>真实姓名：</label>
+        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限表达式：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="text" class="input-text" value="${user.realname }" placeholder="请输入真实姓名" id="realname" name="realname">
+            <input type="text" class="input-text" value="${permission.expression }" placeholder="请输入权限表达式（模块:功能）" id="expression" name="expression">
         </div>
     </div>
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>初始密码：</label>
+        <label class="form-label col-xs-4 col-sm-3">权限地址：</label>
         <div class="formControls col-xs-8 col-sm-9">
-            <input type="password" class="input-text" autocomplete="off" value="" placeholder="密码" id="password" name="password">
+            <input type="text" class="input-text" autocomplete="off" value="${permission.url }" placeholder="url" id="url" name="url">
         </div>
     </div>
-    <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>确认密码：</label>
-        <div class="formControls col-xs-8 col-sm-9">
-            <input type="password" class="input-text" autocomplete="off"  placeholder="确认新密码" id="password2" name="password2">
-        </div>
-    </div>
-    <!-- <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>性别：</label>
+     <div class="row cl">
+        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限类型：</label>
         <div class="formControls col-xs-8 col-sm-9 skin-minimal">
             <div class="radio-box">
-                <input name="sex" type="radio" id="sex-1" checked>
-                <label for="sex-1">男</label>
+                <input name="type" type="radio" id="sex-1" value="permission" ${permission.type eq 'permission' ? 'checked':'' }>
+                <label for="sex-1">普通权限</label>
             </div>
             <div class="radio-box">
-                <input type="radio" id="sex-2" name="sex">
-                <label for="sex-2">女</label>
+                <input type="radio" id="sex-2" name="type" value="menu" ${permission.type eq 'menu' ? 'checked':'' }>
+                <label for="sex-2">菜单权限</label>
             </div>
         </div>
-    </div> -->
+    </div> 
     <div class="row cl">
-        <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色：</label>
+        <label class="form-label col-xs-4 col-sm-3">角色：</label>
         <div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
-            <select class="select" name="roleId" size="1">
+            <select class="select" name="parentId" size="1">
                 <option value="0">--请选择--</option>
-                <c:forEach items="${roles }" var="role" >
-                    <option ${user.roleId eq role.roleId ? 'selected':'' } value="${role.roleId }">${role.rolename }</option>
+                <c:forEach items="${parents }" var="parent" >
+                    <c:if test="${parent.parentId != null }">
+                        <option ${ permission.permissionId eq parent.permissionId ? 'selected':'' } value="${parent.permissionId }">${parent.name }</option>
+                    </c:if>
                 </c:forEach>
             </select>
             </span> </div>
@@ -102,57 +98,30 @@
 <script type="text/javascript" src="lib/jquery.validation/1.14.0/messages_zh.js"></script> 
 <script type="text/javascript">
 $().ready(function(){
-	$("#adminEdit").validate({
+	$("#permissionEdit").validate({
 		//定义校验规则
 		rules:{
-			username:{
-				required:true,
-				rangelength:[3,10],
-				remote: {
-				    url: "admin/checkUsername.do",     //后台处理程序
-				    type: "post",               //数据发送方式
-				    dataType: "json",           //接受数据格式   
-				    data: {                     //要传递的数据
-				        username: function() {
-				            return $("#username").val();
-				        }
-				    }
-				}
+			name:{
+				required:true
 			},
-			realname:{
-				required:true,
-				isChinese:true,
-				rangelength:[2,10]
+			expression:{
+				required:true
 			},
-			password:{
-				required:true,
-				rangelength:[3,10]
-			},
-			password2:{
-				equalTo:"#password"
-			},
-			rolename:{
-				min:1
+			parentId:{
+				required:true
 			}
 		},
 		//校验失败的信息提示
 		messages:{
 			 username:{
 	                required:"用户名不能为空",
-	                rangelength:"用户名的长度3~10",
-	                remote: "账户已存在，请换一个试试"
 	            },
-	            realname:{
-	                required:"真实姓名不能为空",
-	                isChinese:"真实姓名必须是汉字",
-	                rangelength:"真实姓名2~10个汉字"
+	            expression:{
+	                required:"权限表达式不能为空",
 	            },
-	            password:{
-	                required:"密码不能为空",
-	                rangelength:"密码长度3~10"
-	            },
-	            password2:"两次密码不一致",
-	            rolename:"请选择一个角色"
+	            parentId:{
+	                required:"必须要选中一个权限类型"
+	            }
 		},
 		//校验成功的回调
 		submitHandler:function(form){
